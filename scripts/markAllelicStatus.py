@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 ## HiC-Pro
-## Copyright (c) 2015 Institut Curie                               
+## Copyright (c) 2015 Institut Curie
 ## Author(s): Nicolas Servant, Eric Viara
 ## Contact: nicolas.servant@curie.fr
 ## This software is distributed without any guarantee under the terms of the BSD-3 licence.
@@ -50,9 +50,9 @@ def get_args():
     return opts
 
 
-def get_snp_gt(gt, ref, alt): #!gt = ['0/1']         
+def get_snp_gt(gt, ref, alt): #!gt = ['0/1']
     gtsnp = []
-    
+
     ## gtsnp.append(ref)
     snp_geno = re.split('/|\|', gt)
     ## '.' are not considered
@@ -68,7 +68,7 @@ def get_snp_gt(gt, ref, alt): #!gt = ['0/1']
         gtsnp.append(alt)
     else:
         gtsnp.append(None)
-    
+
     ## Second Allele
     if int(snp_geno[1]) == 0:
         gtsnp.append(ref)
@@ -78,13 +78,13 @@ def get_snp_gt(gt, ref, alt): #!gt = ['0/1']
         gtsnp.append(None)
 
     return gtsnp
-    
+
 
 
 def load_vcf(in_file, filter_qual=False, verbose=False, debug=False):
     """
     Load a VCF file in a dict object
-    
+
     in_file = path to VCF file [character]
     filter_qual = if True, only good quality SNV are selected [boolean]
     verbose = if True, verbose mode[boolean]
@@ -96,7 +96,7 @@ def load_vcf(in_file, filter_qual=False, verbose=False, debug=False):
     if in_file.endswith(".gz"):
         vcf_handle = gzip.open(in_file, 'rt')
     else:
-        vcf_handle = open(in_file)    
+        vcf_handle = open(in_file)
     header = []
     samples = []
     snps = {}
@@ -123,11 +123,11 @@ def load_vcf(in_file, filter_qual=False, verbose=False, debug=False):
             if var_counter == 1:
                 formate = fields[8] if n>8 else None
                 if formate.split(':')[0] != "GT":
-                    print("Error : Invalid format - GT not detected at first position in ", file=sys.stderr)        
+                    print("Error : Invalid format - GT not detected at first position in ", file=sys.stderr)
                     sys.exit(-1)
 
             genotypes  = fields[9].split('\t') if fields[9] else []
-            geno = get_snp_gt(genotypes[0].split(':')[0], ref, alt)      
+            geno = get_snp_gt(genotypes[0].split(':')[0], ref, alt)
             if (filter_qual == False) or (filter_qual == True and qfilter == "PASS"):
                 if debug:
                     print("{} - {} - {} -REF= {} -ALT= {} -G1= {} -G2= {}".format(str(chrom), str(start),
@@ -141,7 +141,7 @@ def load_vcf(in_file, filter_qual=False, verbose=False, debug=False):
 
         if (var_counter % 100000 == 0 and verbose):
                 print("##", var_counter)
- 
+
     vcf_handle.close()
     if verbose:
         print("## Number of loaded SNPs = {} over {}".format(len(snps)/2, var_counter))
@@ -152,7 +152,7 @@ def get_read_tag(read, tag):
     """
     Return a read's tag
 
-    read  = read object [class pysam.AlignedSegment]      
+    read  = read object [class pysam.AlignedSegment]
     tag = name of the tag to return [character]
     """
     if t[0] == tag:
@@ -165,7 +165,7 @@ def get_mismatches_positions(read, base=None):
     Extract the mismatch positions within the read for all mismatches or for a specified base
     Insertion are take into account and extracted from the CIGAR string
     Mismatch positions are extracted from the MD tag
-    
+
     read = read object [class pysam.AlignedSegment]
     base = optional - base to look at [character]
 
@@ -173,8 +173,8 @@ def get_mismatches_positions(read, base=None):
     md = read.get_tag('MD')
     x = -1 ## 0-based
     npos = [] ## 0-based
-    digits = []    
-    
+    digits = []
+
     ## Get N pos in the read according to MD tag
     # for y in range(len(md)):
     y = 0
@@ -196,9 +196,9 @@ def get_mismatches_positions(read, base=None):
             if len(digits) > 0:
                 offset = int(''.join(digits))
                 if base is None or (base is not None and md[y] == base):
-                    npos.append(x + offset + 1)               
+                    npos.append(x + offset + 1)
                 digits = []
-                x += offset + 1 
+                x += offset + 1
                 #print "x pos="+str(x)
         y += 1
 
@@ -239,7 +239,7 @@ def getGenomePos(read, pos):
             else:
                 ngenomepos.append(genomePos[y])
     return ngenomepos
-    
+
 
 def getBaseAt(read, pos):
     """
@@ -304,7 +304,7 @@ if __name__ == "__main__":
     output = "-"
     tag = "XA"
     snps = {}
-    
+
     if len(opts) == 0:
         usage()
         sys.exit()
@@ -335,10 +335,11 @@ if __name__ == "__main__":
     g2_counter = 0
     cf_counter = 0
     N_counter = 0
+    N_readcounter = 0 ## KBrick March 17 2021: added
 
     # Read the SNP file
     snps = load_vcf(snpFile, filter_qual=False, verbose=verbose, debug=False)
-    
+
     # Read the SAM/BAM file
     if verbose:
         print("## Opening SAM/BAM file {} ...".format(mappedReadsFile))
@@ -349,8 +350,8 @@ if __name__ == "__main__":
         outfile = pysam.AlignmentFile(output, "w", template=infile)
     else:
         outfile = pysam.AlignmentFile(output, "wb", template=infile)
-     
-   # Verbose mode                                                                                                                                                        
+
+   # Verbose mode
     if verbose:
         print("## " + __file__)
         print("## ibam=", mappedReadsFile)
@@ -364,19 +365,21 @@ if __name__ == "__main__":
     if verbose:
         print("## Assigning allele specific information ...")
 
-  
+
     for read in infile.fetch(until_eof=True):
         reads_counter += 1
         if not read.is_unmapped:## and read.cigarstring.find("D") != -1:
             read_chrom = infile.get_reference_name(read.tid)
             Nreadpos = get_mismatches_positions(read, base="N")
             if (len(Nreadpos) > 0):
+                ## KBrick March 17 2021: add N_readcounter                
                 N_counter += len(Nreadpos)
+                N_readcounter += 1
                 Ngenomepos = getGenomePos(read, Nreadpos)
                 Nbase = getBaseAt(read, Nreadpos)
                 tagval = getAllelicStatus(read_chrom, Ngenomepos, Nbase, snps, debug=debug)
                 read.set_tag(tag, tagval)
-            
+
                 if debug:
                     for i in range(len(Nreadpos)):
                         if Ngenomepos[i] != None:
@@ -389,7 +392,7 @@ if __name__ == "__main__":
                 elif tagval == 2:
                     g2_counter += 1
                 elif tagval == 3:
-                    cf_counter += 1                                        
+                    cf_counter += 1
             else:
                 read.set_tag(tag, 0)
                 ua_counter += 1
@@ -403,7 +406,7 @@ if __name__ == "__main__":
             print("##", reads_counter)
 
     # Close handler
- 
+
     # Write stats file
     if report:
         handle_stat = open(re.sub(r'\.bam$|\.sam$', '.allelstat', output), 'w')
@@ -416,16 +419,18 @@ if __name__ == "__main__":
         handle_stat.write("## =========================\n")
 
         handle_stat.write("Total number of snps loaded\t" + str(len(snps)/2) + "\n")
-               
+
         handle_stat.write("## =========================\n")
 
         handle_stat.write("Total number of reads\t" + str(reads_counter) + "\t100" + "\n")
-        handle_stat.write("Number of reads with at least one 'N'\t" + str(N_counter) + "\t" + str(round(float(N_counter)/int(reads_counter)*100,3)) + "\n")
+        # KBrick March 17 2021: Report both the number of N's and the number of reads with at least one N
+        handle_stat.write("Number of 'N's\t" + str(N_counter) + "\n")
+        handle_stat.write("Number of reads with at least one 'N'\t" + str(N_readcounter) + "\t" + str(round(float(N_readcounter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of reads assigned to ref genome\t" + str(g1_counter) + "\t" + str(round(float(g1_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of reads assigned to alt genome\t" + str(g2_counter) + "\t" + str(round(float(g2_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of conflicting reads\t" + str(cf_counter) + "\t" + str(round(float(cf_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of unassigned reads\t" + str(ua_counter) + "\t" + str(round(float(ua_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.close()
-                
+
     infile.close()
     outfile.close()
