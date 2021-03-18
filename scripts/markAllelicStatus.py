@@ -280,7 +280,7 @@ def getAllelicStatus(chrom, gpos, genotype, snps, debug=False):
                 elif snps[(str(chrn), int(gpos[i]), '2')] == genotype[i]:
                     g2_count += 1
                 else:
-                    gNignored += 1
+                    gN_ignored += 1
                     print("Warning : no SNPs found at position {} : {}. N ignored".format(chrom, str(gpos[i]+1)), file=sys.stderr)
 
     if g1_count > 0 and g2_count > 0:
