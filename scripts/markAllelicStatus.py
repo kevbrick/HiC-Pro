@@ -416,6 +416,8 @@ if __name__ == "__main__":
 
     # Write stats file
     if report:
+        unN_counter = N_readcounter - g1_counter - g2_counter
+        unother_counter = ua_counter - unN_counter
         handle_stat = open(re.sub(r'\.bam$|\.sam$', '.allelstat', output), 'w')
         handle_stat.write("## " + __file__ + "\n")
         handle_stat.write("## ibam=" + mappedReadsFile + "\n")
@@ -433,12 +435,24 @@ if __name__ == "__main__":
         # KBrick March 17 2021: Report both the number of N's and the number of reads with at least one N
         handle_stat.write("Number of 'N's\t" + str(N_counter) + "\n")
         handle_stat.write("Number of reads with at least one 'N'\t" + str(N_readcounter) + "\t" + str(round(float(N_readcounter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Number of unassigned reads\t" + str(ua_counter) + "\t" + str(round(float(ua_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("## = PERCENTAGES ========================\n")
         handle_stat.write("Number of reads assigned to ref genome\t" + str(g1_counter) + "\t" + str(round(float(g1_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of reads assigned to alt genome\t" + str(g2_counter) + "\t" + str(round(float(g2_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Number of unassigned N-containing reads\t" + str(unN_counter) + "\t" + str(round(float(unN_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Number of other type unassigned reads\t" + str(unother_counter) + "\t" + str(round(float(unother_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of conflicting reads\t" + str(cf_counter) + "\t" + str(round(float(cf_counter)/int(reads_counter)*100,3)) + "\n")
-        handle_stat.write("Number of unassigned reads\t" + str(ua_counter) + "\t" + str(round(float(ua_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of other reads\t" + str(uu_counter) + "\t" + str(round(float(uu_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("## = FOR-R ========================\n")
+        handle_stat.write("type\tcount\tpercent\n")
+        handle_stat.write("Ref\t" + str(g1_counter) + "\t" + str(round(float(g1_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Alt\t" + str(g2_counter) + "\t" + str(round(float(g2_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Unassigned_withN\t" + str(unN_counter) + "\t" + str(round(float(unN_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Other_unassigned\t" + str(unother_counter) + "\t" + str(round(float(unother_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Conflicting\t" + str(cf_counter) + "\t" + str(round(float(cf_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Other\t" + str(uu_counter) + "\t" + str(round(float(uu_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.close()
 
     infile.close()
     outfile.close()
+
