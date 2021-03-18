@@ -267,7 +267,7 @@ def getAllelicStatus(chrom, gpos, genotype, snps, debug=False):
     """
 
     code = None
-    g1_count, g2_count = 0, 0
+    g1_count, g2_count, gN_ignored = 0, 0, 0
     l = len(genotype)
     chrn = re.sub("^[Cc]hr","",chrom)
 
@@ -280,6 +280,7 @@ def getAllelicStatus(chrom, gpos, genotype, snps, debug=False):
                 elif snps[(str(chrn), int(gpos[i]), '2')] == genotype[i]:
                     g2_count += 1
                 else:
+                    gNignored += 1
                     print("Warning : no SNPs found at position {} : {}. N ignored".format(chrom, str(gpos[i]+1)), file=sys.stderr)
 
     if g1_count > 0 and g2_count > 0:
@@ -289,7 +290,10 @@ def getAllelicStatus(chrom, gpos, genotype, snps, debug=False):
     elif g2_count > 0 and g1_count == 0:
         code = 2
     elif g1_count == 0 and g2_count == 0:
-        code = 0
+        if gN_ignored == 0:
+            code = 0
+        else:
+            code = 4
 
     return code
 
@@ -394,7 +398,7 @@ if __name__ == "__main__":
                     g2_counter += 1
                 elif tagval == 3:
                     cf_counter += 1
-                else:
+                elif tagval == 4:
                     uu_counter += 1
             else:
                 read.set_tag(tag, 0)
