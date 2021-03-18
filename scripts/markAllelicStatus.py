@@ -394,7 +394,7 @@ if __name__ == "__main__":
                     g2_counter += 1
                 elif tagval == 3:
                     cf_counter += 1
-                else
+                else:
                     uu_counter += 1
             else:
                 read.set_tag(tag, 0)
