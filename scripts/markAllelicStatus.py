@@ -334,6 +334,7 @@ if __name__ == "__main__":
     g1_counter = 0
     g2_counter = 0
     cf_counter = 0
+    uu_counter = 0
     N_counter = 0
     N_readcounter = 0 ## KBrick March 17 2021: added
 
@@ -372,7 +373,7 @@ if __name__ == "__main__":
             read_chrom = infile.get_reference_name(read.tid)
             Nreadpos = get_mismatches_positions(read, base="N")
             if (len(Nreadpos) > 0):
-                ## KBrick March 17 2021: add N_readcounter                
+                ## KBrick March 17 2021: add N_readcounter
                 N_counter += len(Nreadpos)
                 N_readcounter += 1
                 Ngenomepos = getGenomePos(read, Nreadpos)
@@ -393,6 +394,8 @@ if __name__ == "__main__":
                     g2_counter += 1
                 elif tagval == 3:
                     cf_counter += 1
+                else
+                    uu_counter += 1
             else:
                 read.set_tag(tag, 0)
                 ua_counter += 1
@@ -430,6 +433,7 @@ if __name__ == "__main__":
         handle_stat.write("Number of reads assigned to alt genome\t" + str(g2_counter) + "\t" + str(round(float(g2_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of conflicting reads\t" + str(cf_counter) + "\t" + str(round(float(cf_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Number of unassigned reads\t" + str(ua_counter) + "\t" + str(round(float(ua_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("Number of other reads\t" + str(uu_counter) + "\t" + str(round(float(uu_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.close()
 
     infile.close()
