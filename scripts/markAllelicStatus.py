@@ -451,8 +451,14 @@ if __name__ == "__main__":
         handle_stat.write("Other_unassigned\t" + str(unother_counter) + "\t" + str(round(float(unother_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Conflicting\t" + str(cf_counter) + "\t" + str(round(float(cf_counter)/int(reads_counter)*100,3)) + "\n")
         handle_stat.write("Other\t" + str(uu_counter) + "\t" + str(round(float(uu_counter)/int(reads_counter)*100,3)) + "\n")
+        handle_stat.write("## = FOR-MULTIQC ========================\n")
+        handle_stat.write("allelic_status/genome1\t" + str(g1_counter)+ "\n")
+        handle_stat.write("allelic_status/genome2\t" + str(g2_counter)+ "\n")
+        handle_stat.write("allelic_status/unassignedN\t" + str(unN_counter)+ "\n")
+        handle_stat.write("allelic_status/unassigned_other\t" + str(unother_counter)+ "\n")
+        handle_stat.write("allelic_status/conflicting\t" + str(cf_counter)+ "\n")
+        handle_stat.write("allelic_status/other\t" + str(uu_counter)+ "\n")
         handle_stat.close()
 
     infile.close()
     outfile.close()
-
